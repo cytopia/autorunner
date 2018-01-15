@@ -1,0 +1,399 @@
+#!/usr/bin/env bash
+#
+# Autorunner handles tool to autostart.
+#
+
+set -e
+set -u
+
+############################################################
+# Variables
+############################################################
+
+###
+### Program variables
+###
+MY_NAME="autorunner"
+MY_CONF="config"
+
+
+###
+### XDG_CONFIG_HOME
+###
+if ! set | grep '^XDG_CONFIG_HOME=' >/dev/null 2>&1; then
+	XDG_CONFIG_HOME="${HOME}/.config"
+fi
+if [ -z "${XDG_CONFIG_HOME}" ]; then
+	XDG_CONFIG_HOME="${HOME}/.config"
+fi
+
+
+###
+### XDG_DATA_HOME
+###
+if ! set | grep '^XDG_DATA_HOME=' >/dev/null 2>&1; then
+	XDG_DATA_HOME="${HOME}/.local/share"
+fi
+if [ -z "${XDG_DATA_HOME}" ]; then
+	XDG_DATA_HOME="${HOME}/.local/share"
+fi
+
+
+###
+### Generated variables
+###
+AUTO_RUNNER_CFG_DIR="${XDG_CONFIG_HOME}/${MY_NAME}"
+AUTO_RUNNER_LOG_DIR="${XDG_DATA_HOME}/${MY_NAME}/log"
+AUTO_RUNNER_RUN_DIR="${XDG_DATA_HOME}/${MY_NAME}/run"
+
+
+###
+### Has notification tools (will be disabled if not)
+###
+AUTORUNNER_HAS_NOTIFY=1
+
+
+############################################################
+# Functions
+############################################################
+
+###
+### Remove leading and trailing whitespace
+###
+trim() {
+	local var="${*}"
+
+	# Remove leading whitespace characters
+	var="${var#"${var%%[![:space:]]*}"}"
+
+	# Remove trailing whitespace characters
+	var="${var%"${var##*[![:space:]]}"}"
+
+	# Return output
+	echo "${var}"
+}
+
+
+###
+### Logger
+###
+logger() {
+	local lvl="${1}"
+	local msg="${2}"
+	local log="${AUTO_RUNNER_LOG_DIR}/${MY_NAME}.log"
+	local pre
+	pre="$( date +'%Y-%m-%d  %H:%M:%S' )"
+
+	case "${lvl}" in
+		err)
+			printf "[%s] [ERROR]:   %s\n" "${pre}" "${msg}" >> "${log}"
+			;;
+		warn)
+			printf "[%s] [WARN]:    %s\n" "${pre}" "${msg}" >> "${log}"
+			;;
+		info)
+			printf "[%s] [INFO]:    %s\n" "${pre}" "${msg}" >> "${log}"
+			;;
+		*)
+			printf "[%s] [UNKNOWN]: %s\n" "${pre}" "${msg}" >> "${log}"
+			;;
+	esac
+}
+
+
+###
+### Get basename binary without arguments from command
+###
+get_binary() {
+	local cmd="${1}"
+	local bin
+
+	# Get basename without arguments
+	bin="$( basename "${cmd%%[[:space:]]*}" )"
+	bin="$( trim "${bin}" )"
+
+	echo "${bin}"
+}
+
+###
+### Get arguments from command
+###
+get_arguments() {
+	local cmd="${1}"
+	local bin
+
+	# get basename binary without arguments
+	bin="$( get_binary "${cmd}" )"
+
+	# get arguments
+	arg="${cmd#*${bin}}"
+	arg="${arg##*${bin}}"
+	arg="$( trim "${arg}" )"
+
+	echo "${arg}"
+}
+
+###
+### Get logname from binary and arguments
+###
+get_logname() {
+	local bin="${1}"
+	local arg="${2}"
+	local log
+
+	# get logname
+	if [ -n "${arg}" ]; then
+		log="${bin}_${arg}"
+	else
+		log="${bin}"
+	fi
+	log="${log//\//_}"          # / to _
+	log="${log//\"/}"           # remove "
+	log="${log//\'/}"           # remove '
+	log="${log//[[:space:]]/_}" # spaces to _
+	log="${log:0:20}"           # only 20 characters
+
+	echo "${log}"
+}
+
+###
+### Check if command is running
+###
+is_running() {
+	local cmd="${1}"
+	local pidfile="${2}"
+	local pid
+	#local base
+	local bin
+
+	bin="$( get_binary "${cmd}" )"
+	#base="${cmd%%[[:space:]]*}"
+
+	# 1. Get pid via ps aux (full command):
+	# This catches multiple instances
+	if pid="$( ps aux | grep -E "${cmd}\$" | awk '{print $2}' )"; then
+		if [ -n "${pid}" ]; then
+			echo "${pid}" | xargs
+			return 0
+		fi
+	fi
+
+	# 2. Get pid via own pidfile
+	if [ -f "${pidfile}" ]; then
+		pid="$( cat "${pidfile}" )"
+		if [ -n "${pid}" ]; then
+			if ps aux | awk '{print $2}' | grep -q "${pid}"; then
+				echo "${pid}"
+				return 0
+			fi
+		fi
+	fi
+
+	# 3. Get pid via pidof
+	#if pid="$( pidof "${bin}" )"; then
+	#	echo "${pid}"
+	#	return 0
+	#fi
+
+	# 4. Get pid via ps aux (without arguments)
+	#if pid="$( ps aux | grep -E "${base}\$" | awk '{print $2}' )"; then
+	#	if [ -n "${pid}" ]; then
+	#		echo "${pid}"
+	#		return 0
+	#	fi
+	#fi
+
+	return 1
+}
+
+
+###
+### Notifier
+###
+notify() {
+	local urgency="${1}"
+	local message="${2}"
+
+	if [ "${AUTORUNNER_HAS_NOTIFY}" = "1" ]; then
+		notify-send -u "${urgency}" "${MY_NAME}" "${message}"
+	fi
+}
+
+#
+# Wrapper to start stuff with logging
+# and pre-killing functionality
+#
+# @param int	$1	Restart? 0: no, 1: yes
+# @param string	$2	Command
+execute() {
+	# Input
+	local restart="${1}"
+	local notify="${2}"
+	local command="${3}"
+	# Generated
+	local bin
+	local arg
+	local log
+	local pid
+	# Files
+	local pidfile
+	local errfile
+	local outfile
+
+	# Separate command into bin and args
+	bin="$( get_binary "${command}" )"
+	arg="$( get_arguments "${command}" )"
+	# Build log file name
+	log="$( get_logname "${bin}" "${arg}" )"
+
+	# Set output files
+	outfile="${AUTO_RUNNER_LOG_DIR}/${log}.out"
+	errfile="${AUTO_RUNNER_LOG_DIR}/${log}.err"
+	pidfile="${AUTO_RUNNER_RUN_DIR}/${log}.pid"
+
+	# Kill prior starting?
+	if [ "${restart}" = "1" ]; then
+		logger "info" "(${bin}) restart required"
+		logger "info" "(${bin}) trying to kill"
+
+		# Check if it is actually running
+		if pid="$( is_running "${command}" "${pidfile}" )"; then
+			logger "info" "(${bin}) running with pid '${pid}'"
+
+			# Try to kill
+			for p in ${pid}; do
+				if ! kill "${p}" >/dev/null 2>&1; then
+					logger "err" "(${bin}) could not kill pid: '${pid}'"
+				else
+					if [ "${notify}" = "1" ]; then
+						notify low "Stopping ${bin}"
+					fi
+					logger "info" "(${bin}) killed pid: '${pid}'"
+				fi
+			done
+
+		else
+			logger "info" "(${bin}) is not running, nothing to do"
+		fi
+	fi
+
+	# Only start if not running
+	if pid="$( is_running "${command}" "${pidfile}" )"; then
+		logger "info" "(${bin}) already running with pid: '${pid}'"
+	else
+		eval "nohup ${command} >> ${outfile} 2>> ${errfile} &"
+		pid="${!}"
+		if [ "${notify}" = "1" ]; then
+			notify low "Started ${bin}"
+		fi
+		logger "info" "(${bin}) started with pid '${pid}'"
+		echo "${pid}" > "${pidfile}"
+	fi
+}
+
+
+
+############################################################
+# Entrypoint: Prepare
+############################################################
+
+###
+### Ensure directories exist
+###
+if [ ! -d "${AUTO_RUNNER_LOG_DIR}" ]; then
+	if ! mkdir -p "${AUTO_RUNNER_LOG_DIR}"; then
+		>&2 echo "Cannot create log dir: ${AUTO_RUNNER_LOG_DIR}"
+		exit 1
+	fi
+fi
+if [ ! -d "${AUTO_RUNNER_CFG_DIR}" ]; then
+	if ! mkdir -p "${AUTO_RUNNER_CFG_DIR}"; then
+		>&2 echo "Cannot create cfg dir: ${AUTO_RUNNER_CFG_DIR}"
+		exit 1
+	fi
+fi
+if [ ! -d "${AUTO_RUNNER_RUN_DIR}" ]; then
+	if ! mkdir -p "${AUTO_RUNNER_RUN_DIR}"; then
+		>&2 echo "Cannot create run dir: ${AUTO_RUNNER_RUN_DIR}"
+		exit 1
+	fi
+fi
+
+
+###
+### Ensure directory permissions are correct
+###
+if ! chmod 0700 "${AUTO_RUNNER_LOG_DIR}"; then
+	>&2 echo "Cannot chmod 0700 log dir: ${AUTO_RUNNER_LOG_DIR}"
+	exit 1
+fi
+
+if ! chmod 0700 "${AUTO_RUNNER_RUN_DIR}"; then
+	>&2 echo "Cannot chmod 0700 log dir: ${AUTO_RUNNER_LOG_DIR}"
+	exit 1
+fi
+
+
+
+############################################################
+# Entrypoint: Start
+############################################################
+
+logger "info" "==================== ${MY_NAME} triggered ===================="
+
+###
+### Create config if it does not exist
+###
+if [ ! -f "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}" ]; then
+	{
+		echo "# Autorunner configuration file"
+		echo "#"
+		echo "# Usage: execute \"<restart>\" \"<notify>\" \"<command>\""
+		echo "#"
+		echo "#   <restart>    1: Kill the process and restart it"
+		echo "#                0: Only start when it is not running"
+		echo "#"
+		echo "#   <notify>     1: Notify via notifications when started/restarted"
+		echo "#                0: Do not notify"
+		echo "#   <command>    Full command (including arguments) to run"
+		echo "#"
+		echo "# Examples:"
+		echo "#"
+		echo "#   # Run clipmenu once (never restart it)"
+		echo "#   execute \"0\" \"0\" \"clipmenud\""
+		echo "#"
+		echo "#   # Run thunar daemon and always restart it when autorunner is called again"
+		echo "#   # Always trigger notifications whenever it is stopped and restarted"
+		echo "#   execute \"1\" \"1\" \"thunar --daemon\""
+		echo "#"
+	} > "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}"
+	chmod 0600 "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}"
+fi
+
+
+###
+### Validate config
+###
+if [ ! -r "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}" ]; then
+	>&2 echo "Configuration file is not readable: ${AUTO_RUNNER_CFG_DIR}/${MY_CONF}"
+	>&2 echo "Aborting"
+	logger "err" "Configuration file is not readable: ${AUTO_RUNNER_CFG_DIR}/${MY_CONF}"
+	logger "err" "Aborting"
+	exit 1
+fi
+
+
+###
+### Ensure requirements are met
+###
+if ! command -v notify-send >/dev/null 2>&1; then
+	logger "err" "notify-send binary does not exist. You will not receive any notifications"
+	AUTORUNNER_HAS_NOTIFY=0
+fi
+
+
+###
+### Run
+###
+# shellcheck disable=SC1090
+. "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}"

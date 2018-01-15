@@ -1,0 +1,38 @@
+# Autorunner configuration file
+#
+# Usage: execute "<restart>" "<notify>" "<command>"
+#
+#   <restart>    1: Kill the process and restart it
+#                0: Only start when it is not running
+#
+#   <notify>     1: Notify via notifications when started/restarted
+#                0: Do not notify
+#   <command>    Full command (including arguments) to run
+#
+# Examples:
+#
+#   # Run clipmenu once (never restart it)
+#   execute "0" "0" "clipmenud"
+#
+#   # Run thunar daemon and always restart it when autorunner is called again
+#   # Always trigger notifications whenever it is stopped and restarted
+#   execute "1" "1" "thunar --daemon"
+#
+
+# Run clipmenud (dont restart, but notify)
+execute "0" "1" "clipmenud"
+
+# Auto-lock screen (dont restart, but notify)
+execute "0" "1" "xss-lock -v -n \"notify-send --urgency=critical --icon=/usr/share/icons/Adwaita/48x48/actions/system-lock-screen.png -- 'Auto-lock in 30 sec.'\" -- /usr/local/bin/xlock"
+
+# Network Manager Applet (dont restart, but notify)
+execute "0" "1" "nm-applet"
+
+# Filemanager Daemon for automounts (restart and notify)
+execute "1" "1" "thunar --daemon"
+
+## Compositor (restart ant notify)
+execute "1" "1" "compton"
+
+# Notification daemon (dont restart, but notify)
+execute "0" "1" "dunst"
