@@ -4,6 +4,7 @@
 **[Installation](#installation)** |
 **[Configuration file](#configuration-file)** |
 **[Log files](#log-files)** |
+**[Requirements](#requirements)** |
 **[Screenshots](#screenshots)** |
 **[License](#license)**
 
@@ -68,12 +69,12 @@ Command or services to start up are configured in the following form:
 execute "<restart>" "<notify>" "<command>"
 ```
 
-### `<restart>`
+#### `<restart>`
 * Can take a value of `0` or `1`
 * `0`: Only start when it is not running, but never restart it
 * `1`: If it is running, stop it and then start it again. If it is not running, start it
 
-### `<notify>`
+#### `<notify>`
 * Can take a value of `0` or `1`
 * `0`: Do not send any notifications
 * `1`: Send notifications to the running notification service about stop and start events (requires `notify-send`)
@@ -81,7 +82,7 @@ execute "<restart>" "<notify>" "<command>"
 #### `<command>`
 This can be an absolute or relative path including arguments of any command. Commands can be foreground or background daemons as well as one-shots such as setting your wallpaper via `feh`
 
-### Examples
+#### Examples
 ```bash
 execute "0" "1" "dunst"
 
