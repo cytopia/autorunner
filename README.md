@@ -13,7 +13,7 @@ By having log files available for commands that usually don't log, you can alway
 
 ## TL;DR
 
-#### 1. Set up services
+### 1. Set up services
 
 **`$XDG_CONFIG_HOME/autorunner/config:`**
 ```bash
@@ -35,14 +35,18 @@ execute "0" "1" "clipmenud"
 execute "1" "1" "thunar --daemon"
 ```
 
-#### 2. Hook autorunner into any startup
+### 2. Hook autorunner into any startup
 
-**Example for i3-wm (`$XDG_CONFIG_HOME/i3/config`)**
+**Example for i3-wm**
+
+Put the following line into your i3 config (`$XDG_CONFIG_HOME/i3/config`):
 ```
 exec_always --no-startup-id sh path/to/autorunner
 ```
 
 **Example to manually start it:**
+
+You can always run it manually as often as you want:
 ```bash
 $ /path/to/autorunner
 ```
@@ -57,12 +61,12 @@ Command or services to start up are configured in the following form:
 execute "<restart>" "<notify>" "<command>"
 ```
 
-#### `<restart>`
+### `<restart>`
 * Can take a value of `0` or `1`
 * `0`: Only start when it is not running, but never restart it
 * `1`: If it is running, stop it and then start it again. If it is not running, start it
 
-#### `<notify>`
+### `<notify>`
 * Can take a value of `0` or `1`
 * `0`: Do not send any notifications
 * `1`: Send notifications to the running notification service about stop and start events (requires `notify-send`)
@@ -70,7 +74,7 @@ execute "<restart>" "<notify>" "<command>"
 #### `<command>`
 This can be an absolute or relative path including arguments of any command. Commands can be foreground or background daemons as well as one-shots such as setting your wallpaper via `feh`
 
-#### Examples
+### Examples
 ```bash
 execute "0" "1" "dunst"
 
@@ -91,13 +95,33 @@ There are three different types of logs:
 
 | Log file | Description |
 |----------|-------------|
-| autorunner.log | `autorunner`s own log file keeping track of all events
-| <command>.out  | `stdout` of the started command |
-| <command>.err  | `stderr` of the started command |
+| `autorunner.log` | `autorunner`s own log file keeping track of all events
+| `<command>.out`  | `stdout` of the started command |
+| `<command>.err`  | `stderr` of the started command |
 
-#### Examples
+### Examples
 
-**autorunner.log**
+#### log directory
+```bash
+$ ls -l
+-rw-r--r-- 1 cytopia 39496 Jan 16 06:42 autorunner.log
+-rw-r--r-- 1 cytopia   659 Jan 16 06:49 compton.err
+-rw-r--r-- 1 cytopia 12288 Jan 15 11:31 compton.out
+-rw-r--r-- 1 cytopia  1906 Jan 16 05:39 thunar_--daemon.err
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 thunar_--daemon.out
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_b_off.err
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_b_off.out
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_dpms_0_0_300.err
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_dpms_0_0_300.out
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_r_rate_250_40.err
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_r_rate_250_40.out
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_s_600_30.err
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xset_s_600_30.out
+-rw-r--r-- 1 cytopia  1178 Jan 16 06:42 xss-lock_-v_-n_notif.err
+-rw-r--r-- 1 cytopia     0 Jan 15 08:03 xss-lock_-v_-n_notif.out
+```
+
+#### autorunner.log
 ```
 [2018-01-15  14:46:21] [INFO]:    ==================== autorunner triggered ====================
 [2018-01-15  14:46:21] [INFO]:    (clipmenud) already running with pid: '11192'
@@ -116,7 +140,7 @@ There are three different types of logs:
 [2018-01-15  14:46:21] [INFO]:    (compton) started with pid '23493'
 [2018-01-15  14:46:21] [INFO]:    (dunst) already running with pid: '28225'
 ```
-**compton.err**
+#### compton.err
 ```
 glx_bind_pixmap(0x02a1405f): Failed to query Pixmap info.
 win_paint_win(0x01600001): Failed to bind texture. Expect troubles.
