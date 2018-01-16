@@ -1,6 +1,7 @@
 # autorunner
 
 **[TL;DR](#tldr)** |
+**[Installation](#installation)** |
 **[Configuration file](#configuration-file)** |
 **[Log files](#log-files)** |
 **[Screenshots](#screenshots)** |
@@ -51,6 +52,11 @@ You can always run it manually as often as you want:
 ```bash
 $ /path/to/autorunner
 ```
+
+## Installation
+
+Just copy `autorunner` to a location in `$PATH`.
+
 
 ## Configuration file
 **`$XDG_CONFIG_HOME/autorunner/config`**
