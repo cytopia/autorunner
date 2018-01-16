@@ -3,6 +3,7 @@
 **[TL;DR](#tldr)** |
 **[Configuration file](#configuration-file)** |
 **[Log files](#log-files)** |
+**[Screenshots](#screenshots)** |
 **[License](#license)**
 
 [![travis](https://travis-ci.org/cytopia/autorunner.svg?branch=master)](https://travis-ci.org/cytopia/autorunner)
@@ -152,6 +153,14 @@ win_paint_win(0x01600001): Missing painting data. This is a bad sign.
 * `bash` (required)
 * `pgrep` (required)
 * `notify-send` (optional)
+
+
+## Screenshots
+
+Showing autorunner notifications via dunst on i3
+
+[![screenshot](screenshot.png)](screenshot.png)
+
 
 ## License
 
