@@ -169,9 +169,10 @@ is_running() {
 	bin="$( get_binary "${cmd}" )"
 	#base="${cmd%%[[:space:]]*}"
 
-	# 1. Get pid via ps aux (full command):
+	# 1. Get pid via pgrep (full command):
 	# This catches multiple instances
-	if pid="$( ps aux | grep -E "${cmd}\$" | awk '{print $2}' )"; then
+	if pid="$( pgrep -f "${cmd}" )"; then
+	#if pid="$( ps aux | grep -E "${cmd}\$" | awk '{print $2}' )"; then
 		if [ -n "${pid}" ]; then
 			echo "${pid}" | xargs
 			return 0
@@ -182,8 +183,8 @@ is_running() {
 	if [ -f "${pidfile}" ]; then
 		pid="$( cat "${pidfile}" )"
 		if [ -n "${pid}" ]; then
-			if ps aux | awk '{print $2}' | grep -q "${pid}"; then
-				echo "${pid}"
+			if ps aux | awk '{print $2}' | grep -qE "^${pid}\$"; then
+				echo "${pid}" | xargs
 				return 0
 			fi
 		fi
@@ -202,7 +203,7 @@ is_running() {
 	#		return 0
 	#	fi
 	#fi
-
+	echo
 	return 1
 }
 
@@ -265,10 +266,14 @@ execute() {
 				if ! kill "${p}" >/dev/null 2>&1; then
 					logger "err" "(${bin}) could not kill pid: '${pid}'"
 				else
+					# Remove pidfile
+					rm "${pidfile}"
+					# Log
+					logger "info" "(${bin}) killed pid: '${pid}'"
+					# Notify
 					if [ "${notify}" = "1" ]; then
 						notify low "Stopping ${bin}"
 					fi
-					logger "info" "(${bin}) killed pid: '${pid}'"
 				fi
 			done
 
@@ -386,6 +391,11 @@ fi
 ###
 ### Ensure requirements are met
 ###
+if ! command -v pgrep >/dev/null 2>&1; then
+	>&2 echo "pgrep binary does not exist, but is required"
+	logerr "err" "pgrep binary does not exist, but is required"
+	exit 1
+fi
 if ! command -v notify-send >/dev/null 2>&1; then
 	logger "err" "notify-send binary does not exist. You will not receive any notifications"
 	AUTORUNNER_HAS_NOTIFY=0
