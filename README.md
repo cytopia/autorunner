@@ -9,7 +9,8 @@
 **[License](#license)**
 
 [![travis](https://travis-ci.org/cytopia/autorunner.svg?branch=master)](https://travis-ci.org/cytopia/autorunner)
-![Tag](https://img.shields.io/github/tag/cytopia/autorunner.svg)
+[![Tag](https://img.shields.io/github/tag/cytopia/autorunner.svg)](https://github.com/cytopia/autorunner/releases)
+[![Void](https://img.shields.io/badge/repository-void--linux-red.svg)](https://github.com/void-linux/void-packages/tree/master/srcpkgs/autorunner)
 
 `autorunner` is an autostart helper for your required desktop services and tools on a leight-weight wm without any integrated autostart manager. Commands can be started or restarted when already running. It offers desktop notifications on events (start and stop) as well as separated logs for `stdout` and `stderr` for each of the started service.
 
