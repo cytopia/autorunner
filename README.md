@@ -12,7 +12,7 @@
 [![Tag](https://img.shields.io/github/tag/cytopia/autorunner.svg)](https://github.com/cytopia/autorunner/releases)
 [![Void](https://img.shields.io/badge/repository-void--linux-red.svg)](https://github.com/void-linux/void-packages/tree/master/srcpkgs/autorunner)
 
-`autorunner` is an autostart helper for your required desktop services and tools on a leight-weight wm without any integrated autostart manager. Commands can be started or restarted when already running. It offers desktop notifications on events (start and stop) as well as separated logs for `stdout` and `stderr` for each of the started service.
+`autorunner` is an autostart helper for your required desktop services and tools on a light-weight wm without any integrated autostart manager. Commands can be started or restarted when already running. It offers desktop notifications on events (start and stop) as well as separated logs for `stdout` and `stderr` for each of the started service.
 
 By having log files available for commands that usually don't log, you can always check if everything runs as expected or if problems might be present.
 
