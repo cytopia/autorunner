@@ -173,7 +173,7 @@ is_running() {
 
 	# 2. Get pid via own pidfile
 	if [ -f "${pidfile}" ]; then
-		pid="$( cat "${pidfile}" )"
+		read -r pid < "${pidfile}"
 		if [ -n "${pid}" ]; then
 			if ps aux | awk '{print $2}' | grep -qE "^${pid}\$"; then
 				echo "${pid}" | xargs
