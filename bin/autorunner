@@ -22,10 +22,7 @@ MY_CONF="config"
 ###
 ### XDG_CONFIG_HOME
 ###
-if ! set | grep '^XDG_CONFIG_HOME=' >/dev/null 2>&1; then
-	XDG_CONFIG_HOME="${HOME}/.config"
-fi
-if [ -z "${XDG_CONFIG_HOME}" ]; then
+if [ -z "${XDG_CONFIG_HOME+defined}" ]; then
 	XDG_CONFIG_HOME="${HOME}/.config"
 fi
 
@@ -33,10 +30,7 @@ fi
 ###
 ### XDG_DATA_HOME
 ###
-if ! set | grep '^XDG_DATA_HOME=' >/dev/null 2>&1; then
-	XDG_DATA_HOME="${HOME}/.local/share"
-fi
-if [ -z "${XDG_DATA_HOME}" ]; then
+if [ -z "${XDG_DATA_HOME+defined}" ]; then
 	XDG_DATA_HOME="${HOME}/.local/share"
 fi
 
@@ -179,7 +173,7 @@ is_running() {
 
 	# 2. Get pid via own pidfile
 	if [ -f "${pidfile}" ]; then
-		pid="$( cat "${pidfile}" )"
+		read -r pid < "${pidfile}"
 		if [ -n "${pid}" ]; then
 			if ps aux | awk '{print $2}' | grep -qE "^${pid}\$"; then
 				echo "${pid}" | xargs
