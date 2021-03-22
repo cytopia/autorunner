@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 #
-# Autorunner handles tool to autostart.
+# Autorunner tool for autostarting applications on a per user level.
 #
 
 set -e
 set -u
+set -o pipefail
 
-############################################################
-# Variables
-############################################################
+
+# --------------------------------------------------------------------------------------------------
+# VARIABLES
+# --------------------------------------------------------------------------------------------------
 
 ###
 ### Program variables
@@ -53,9 +55,9 @@ AUTO_RUNNER_RUN_DIR="${XDG_DATA_HOME}/${MY_NAME}/run"
 AUTORUNNER_HAS_NOTIFY=1
 
 
-############################################################
-# Functions
-############################################################
+# --------------------------------------------------------------------------------------------------
+# FUNCTIONS
+# --------------------------------------------------------------------------------------------------
 
 ###
 ### Remove leading and trailing whitespace
@@ -73,7 +75,6 @@ trim() {
 	echo "${var}"
 }
 
-
 ###
 ### Logger
 ###
@@ -86,20 +87,19 @@ logger() {
 
 	case "${lvl}" in
 		err)
-			printf "[%s] [ERROR]:   %s\n" "${pre}" "${msg}" >> "${log}"
+			printf "[%s] [ERROR]:   %s\\n" "${pre}" "${msg}" >> "${log}"
 			;;
 		warn)
-			printf "[%s] [WARN]:    %s\n" "${pre}" "${msg}" >> "${log}"
+			printf "[%s] [WARN]:    %s\\n" "${pre}" "${msg}" >> "${log}"
 			;;
 		info)
-			printf "[%s] [INFO]:    %s\n" "${pre}" "${msg}" >> "${log}"
+			printf "[%s] [INFO]:    %s\\n" "${pre}" "${msg}" >> "${log}"
 			;;
 		*)
-			printf "[%s] [UNKNOWN]: %s\n" "${pre}" "${msg}" >> "${log}"
+			printf "[%s] [UNKNOWN]: %s\\n" "${pre}" "${msg}" >> "${log}"
 			;;
 	esac
 }
-
 
 ###
 ### Get basename binary without arguments from command
@@ -163,11 +163,9 @@ is_running() {
 	local cmd="${1}"
 	local pidfile="${2}"
 	local pid
-	#local base
 	local bin
 
 	bin="$( get_binary "${cmd}" )"
-	#base="${cmd%%[[:space:]]*}"
 
 	# 1. Get pid via pgrep (full command):
 	# This catches multiple instances
@@ -190,23 +188,9 @@ is_running() {
 		fi
 	fi
 
-	# 3. Get pid via pidof
-	#if pid="$( pidof "${bin}" )"; then
-	#	echo "${pid}"
-	#	return 0
-	#fi
-
-	# 4. Get pid via ps aux (without arguments)
-	#if pid="$( ps aux | grep -E "${base}\$" | awk '{print $2}' )"; then
-	#	if [ -n "${pid}" ]; then
-	#		echo "${pid}"
-	#		return 0
-	#	fi
-	#fi
 	echo
 	return 1
 }
-
 
 ###
 ### Notifier
@@ -220,12 +204,12 @@ notify() {
 	fi
 }
 
-#
-# Wrapper to start stuff with logging
-# and pre-killing functionality
-#
-# @param int	$1	Restart? 0: no, 1: yes
-# @param string	$2	Command
+
+### Wrapper to start stuff with logging
+### and pre-killing functionality
+###
+### @param int	$1	Restart? 0: no, 1: yes
+### @param string	$2	Command
 execute() {
 	# Input
 	local restart="${1}"
@@ -297,10 +281,9 @@ execute() {
 }
 
 
-
-############################################################
-# Entrypoint: Prepare
-############################################################
+# --------------------------------------------------------------------------------------------------
+# ENTRYPOINT: PRE-FLIGHT CHECK
+# --------------------------------------------------------------------------------------------------
 
 ###
 ### Ensure directories exist
@@ -324,7 +307,6 @@ if [ ! -d "${AUTO_RUNNER_RUN_DIR}" ]; then
 	fi
 fi
 
-
 ###
 ### Ensure directory permissions are correct
 ###
@@ -340,9 +322,9 @@ fi
 
 
 
-############################################################
-# Entrypoint: Start
-############################################################
+# --------------------------------------------------------------------------------------------------
+# ENTRYPOINT: START
+# --------------------------------------------------------------------------------------------------
 
 logger "info" "==================== ${MY_NAME} triggered ===================="
 
@@ -375,7 +357,6 @@ if [ ! -f "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}" ]; then
 	chmod 0600 "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}"
 fi
 
-
 ###
 ### Validate config
 ###
@@ -386,7 +367,6 @@ if [ ! -r "${AUTO_RUNNER_CFG_DIR}/${MY_CONF}" ]; then
 	logger "err" "Aborting"
 	exit 1
 fi
-
 
 ###
 ### Ensure requirements are met
@@ -400,7 +380,6 @@ if ! command -v notify-send >/dev/null 2>&1; then
 	logger "err" "notify-send binary does not exist. You will not receive any notifications"
 	AUTORUNNER_HAS_NOTIFY=0
 fi
-
 
 ###
 ### Run

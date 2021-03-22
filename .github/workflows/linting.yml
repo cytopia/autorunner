@@ -1,0 +1,69 @@
+---
+
+# -------------------------------------------------------------------------------------------------
+# Job Name
+# -------------------------------------------------------------------------------------------------
+name: Linting
+
+
+# -------------------------------------------------------------------------------------------------
+# When to run
+# -------------------------------------------------------------------------------------------------
+on:
+  # Runs on Pull Requests
+  pull_request:
+
+  # Runs on master Branch and Tags
+  push:
+    branches:
+      - master
+    tags:
+      - '[0-9]+.[0-9]+*'
+
+
+# -------------------------------------------------------------------------------------------------
+# What to run
+# -------------------------------------------------------------------------------------------------
+jobs:
+  linting:
+    name: "Linting"
+    runs-on: ubuntu-latest
+    steps:
+
+      # ------------------------------------------------------------
+      # Checkout repository
+      # ------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Show bash versions
+        shell: bash
+        run: |
+          bash --version
+
+      # ------------------------------------------------------------
+      # Lint
+      # ------------------------------------------------------------
+      - name: Pull Artifacts
+        shell: bash
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep 2;
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make _lint-prepare
+        env:
+          RETRIES: 20
+
+      - name: Lint
+        shell: bash
+        run: |
+          make lint
