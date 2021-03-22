@@ -53,3 +53,15 @@ jobs:
         shell: bash
         run: |
           autorunner
+
+      - name: Uninstall
+        shell: bash
+        run: |
+          sudo make uninstall
+
+      - name: Test
+        shell: bash
+        run: |
+          if command -v autorunner; then
+            false
+          fi

@@ -200,7 +200,7 @@ win_paint_win(0x01600001): Missing painting data. This is a bad sign.
 
 
 
-## :octocat: [cytopia](https://github.com/) linux tools
+## :octocat: [cytopia](https://github.com/cytopia) linux tools
 
 Below is a list of Linux command line tools and configurations that I am maintaining.
 
