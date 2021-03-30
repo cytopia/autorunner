@@ -7,7 +7,7 @@
 **[Configure](#wrench-configure)** |
 **[Logging](#open_file_folder-logging)** |
 **[Requirements](#exclamation-requirements)** |
-**[Linux Tools](#octocat-cytopia-linux-tools)** |
+**[Desktop Tools](#octocat-cytopia-desktop-tools)** |
 **[License](#page_facing_up-license)**
 
 [![Linting](https://github.com/cytopia/autorunner/workflows/Linting/badge.svg)](https://github.com/cytopia/autorunner/actions?workflow=Linting)
@@ -200,36 +200,26 @@ win_paint_win(0x01600001): Missing painting data. This is a bad sign.
 
 
 
-## :octocat: [cytopia](https://github.com/cytopia) linux tools
+## :octocat: [cytopia](https://github.com/cytopia) desktop tools
 
-Below is a list of Linux command line tools and configurations that I am maintaining.
+Below is a list of Linux command line tools and configurations that I am using and maintaining for everyday usage on a desktop system.
 
 | Name                                      | GitHub                           | Category    | Description |
 |-------------------------------------------|----------------------------------|-------------|-------------|
 | **[linux-timemachine][time_lnk]**         | [![time_img]][time_lnk]          | Backup      | MacOS-like time machine for Linux, MacOS and BSD |
 | **[mysqldump-secure][mds_lnk]**           | [![mds_img]][mds_lnk]            | Backup      | Encrypted mysqldumps                             |
 |                                           |                                  |             |                                                  |
-| **[dotfiles][dot_lnk]**                   | [![dot_img]][dot_lnk]            | Desktop     | My personal dotfiles                             |
-| **[dotfiles-kali][dotk_lnk]**             | [![dotk_img]][dotk_lnk]          | Desktop     | My personal dotfiles for Kali Linux              |
 | **[autorunner][ar_lnk]**                  | [![ar_img]][ar_lnk]              | Desktop     | Minimalistic autostart manager                   |
 | **[i3blocks-modules][i3b_lnk]**           | [![i3b_img]][i3b_lnk]            | Desktop     | Conditional i3blocks modules                     |
 | **[i3-utils-bin][i3ub_lnk]**              | [![i3ub_img]][i3ub_lnk]          | Desktop     | Binary utilities for a minimalistic i3 setup     |
 | **[i3-utils-systemd][i3us_lnk]**          | [![i3us_img]][i3us_lnk]          | Desktop     | Systemd utilities for a minimalistic i3 setup    |
+| **[thunar-custom-actions][thun_lnk]**     | [![thun_img]][thun_lnk]          | Desktop     | Thunar custom actions                            |
 |                                           |                                  |             |                                                  |
 | **[ffscreencast][ffs_lnk]**               | [![ffs_img]][ffs_lnk]            | Multimedia  | CLI screen casting                               |
 |                                           |                                  |             |                                                  |
-| **[devilbox][dvl_lnk]**                   | [![dvl_img]][dvl_lnk]            | Development | Docker LAMP & MEAN stack                         |
-| **[letsencrypt-watch][lew_lnk]**          | [![lew_img]][lew_lnk]            | Development | Certwatch cron implementation for letsencrypt    |
-| **[nginx-certwatch][ncw_lnk]**            | [![ncw_img]][ncw_lnk]            | Development | Certwatch cron implementation for nginx          |
-| **[cert-gen][cg_lnk]**                    | [![cg_img]][cg_lnk]              | Development | CA and SSL generator                             |
-| **[vhost-gen][vhg_lnk]**                  | [![vhg_img]][vhg_lnk]            | Development | Vhost generator for Nginx and Apache             |
-| **[git-rewrite-author][gra_lnk]**         | [![gra_img]][gra_lnk]            | Development | Rewrite git history                              |
-|                                           |                                  |             |                                                  |
-| **[watcherd][wd_lnk]**                    | [![wd_img]][wd_lnk]              | System      | Watch for directory changes                      |
-| **[watcherp][wp_lnk]**                    | [![wp_img]][wp_lnk]              | System      | Watch for port changes                           |
-|                                           |                                  |             |                                                  |
-| **[aws-export-profile][aep_lnk]**         | [![aep_img]][aep_lnk]            | AWS         | Export AWS profiles                              |
-| **[aws-export-assume-profile][aeap_lnk]** | [![aeap_img]][aeap_lnk]          | AWS         | Export assumable AWS profiles                    |
+| **[dotfiles][dot_lnk]**                   | [![dot_img]][dot_lnk]            | Setup       | My personal dotfiles                             |
+| **[dotfiles-kali][dotk_lnk]**             | [![dotk_img]][dotk_lnk]          | Setup       | My personal dotfiles for Kali Linux              |
+| **[ansible-debian][ans_lnk]**             | [![ans_img]][ffs_lnk]            | Setup       | Ansible provisioner for Debian/i3wm              |
 
 <!-- BACKUP -->
 [time_lnk]: https://github.com/cytopia/linux-timemachine
@@ -239,12 +229,6 @@ Below is a list of Linux command line tools and configurations that I am maintai
 [mds_img]: https://img.shields.io/github/stars/cytopia/mysqldump-secure?style=social
 
 <!-- DESKTOP -->
-[dot_lnk]: https://github.com/cytopia/dotfiles
-[dot_img]: https://img.shields.io/github/stars/cytopia/dotfiles?style=social
-
-[dotk_lnk]: https://github.com/cytopia/dotfiles-kali
-[dotk_img]: https://img.shields.io/github/stars/cytopia/dotfiles-kali?style=social
-
 [ar_lnk]: https://github.com/cytopia/autorunner
 [ar_img]: https://img.shields.io/github/stars/cytopia/autorunner?style=social
 
@@ -260,42 +244,20 @@ Below is a list of Linux command line tools and configurations that I am maintai
 [thun_lnk]: https://github.com/cytopia/thunar-custom-actions
 [thun_img]: https://img.shields.io/github/stars/cytopia/thunar-custom-actions?style=social
 
-<!-- DEVELOPMENT -->
-[dvl_lnk]: https://github.com/cytopia/devilbox
-[dvl_img]: https://img.shields.io/github/stars/cytopia/devilbox?style=social
-
-[lew_lnk]: https://github.com/cytopia/letsencrypt-watch
-[lew_img]: https://img.shields.io/github/stars/cytopia/letsencrypt-watch?style=social
-
-[ncw_lnk]: https://github.com/cytopia/nginx-certwatch
-[ncw_img]: https://img.shields.io/github/stars/cytopia/nginx-certwatch?style=social
-
-[cg_lnk]: https://github.com/devilbox/cert-gen
-[cg_img]: https://img.shields.io/github/stars/devilbox/cert-gen?style=social
-
-[vhg_lnk]: https://github.com/devilbox/vhost-gen
-[vhg_img]: https://img.shields.io/github/stars/devilbox/vhost-gen?style=social
-
-[gra_lnk]: https://github.com/cytopia/git-rewrite-author
-[gra_img]: https://img.shields.io/github/stars/cytopia/git-rewrite-author?style=social
-
 <!-- MULTIMEDIA -->
 [ffs_lnk]: https://github.com/cytopia/ffscreencast
 [ffs_img]: https://img.shields.io/github/stars/cytopia/ffscreencast?style=social
 
-<!-- SYSTEM -->
-[wd_lnk]: https://github.com/devilbox/watcherd
-[wd_img]: https://img.shields.io/github/stars/devilbox/watcherd?style=social
+<!-- SETUP -->
+[dot_lnk]: https://github.com/cytopia/dotfiles
+[dot_img]: https://img.shields.io/github/stars/cytopia/dotfiles?style=social
 
-[wp_lnk]: https://github.com/devilbox/watcherp
-[wp_img]: https://img.shields.io/github/stars/devilbox/watcherp?style=social
+[dotk_lnk]: https://github.com/cytopia/dotfiles-kali
+[dotk_img]: https://img.shields.io/github/stars/cytopia/dotfiles-kali?style=social
 
-<!-- AWS -->
-[aep_lnk]: https://github.com/cytopia/aws-export-profile
-[aep_img]: https://img.shields.io/github/stars/cytopia/aws-export-profile?style=social
+[ans_lnk]: https://github.com/cytopia/ansible-debian
+[ans_img]: https://img.shields.io/github/stars/cytopia/ansible-debian?style=social
 
-[aeap_lnk]: https://github.com/cytopia/aws-export-assume-profile
-[aeap_img]: https://img.shields.io/github/stars/cytopia/aws-export-assume-profile?style=social
 
 
 
