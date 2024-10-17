@@ -245,7 +245,7 @@ execute() {
 					logger "err" "(${bin}) could not kill pid: '${pid}'"
 				else
 					# Remove pidfile
-					rm "${pidfile}"
+					rm "${pidfile}" || true
 					# Log
 					logger "info" "(${bin}) killed pid: '${pid}'"
 					# Notify
